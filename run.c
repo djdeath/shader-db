@@ -48,7 +48,13 @@
 
 #define unlikely(x) __builtin_expect(!!(x), 0)
 
+#ifndef ARRAY_SIZE
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
+#endif
+
+#ifndef MIN
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+#endif
 
 struct context_info {
     char *extension_string;
@@ -564,7 +570,7 @@ main(int argc, char **argv)
     if (signal(SIGSEGV, abort_handler) == SIG_ERR)
         fprintf(stderr, "WARNING: could not install SIGSEGV handler.\n");
 
-    #pragma omp parallel if(max_threads > 1 && shader_test_length > max_threads)
+    #pragma omp parallel num_threads(MIN(shader_test_length, max_threads))
     {
         const char *current_shader_name;
         unsigned shaders_compiled = 0;
