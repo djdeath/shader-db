@@ -479,10 +479,10 @@ main(int argc, char **argv)
         EGL_CONTEXT_MINOR_VERSION_KHR, 2,
         EGL_NONE
     };
-    EGLContext core_ctx = eglCreateContext(egl_dpy, cfg, EGL_NO_CONTEXT,
-                                           attribs);
-    if (core_ctx != EGL_NO_CONTEXT &&
-        eglMakeCurrent(egl_dpy, EGL_NO_SURFACE, EGL_NO_SURFACE, core_ctx)) {
+    EGLContext g_core_ctx = eglCreateContext(egl_dpy, cfg, EGL_NO_CONTEXT,
+                                             attribs);
+    if (g_core_ctx != EGL_NO_CONTEXT &&
+        eglMakeCurrent(egl_dpy, EGL_NO_SURFACE, EGL_NO_SURFACE, g_core_ctx)) {
         int num_extensions;
         glGetIntegerv(GL_NUM_EXTENSIONS, &num_extensions);
 
@@ -529,15 +529,15 @@ main(int argc, char **argv)
         }
     }
 
-    EGLContext compat_ctx = eglCreateContext(egl_dpy, cfg, EGL_NO_CONTEXT,
-                                             &attribs[6]);
-    if (compat_ctx == EGL_NO_CONTEXT) {
+    EGLContext g_compat_ctx = eglCreateContext(egl_dpy, cfg, EGL_NO_CONTEXT,
+                                               &attribs[6]);
+    if (g_compat_ctx == EGL_NO_CONTEXT) {
         fprintf(stderr, "ERROR: eglCreateContext() failed\n");
         ret = -1;
         goto egl_terminate;
     }
 
-    if (!eglMakeCurrent(egl_dpy, EGL_NO_SURFACE, EGL_NO_SURFACE, compat_ctx)) {
+    if (!eglMakeCurrent(egl_dpy, EGL_NO_SURFACE, EGL_NO_SURFACE, g_compat_ctx)) {
         fprintf(stderr, "ERROR: eglMakeCurrent() failed\n");
         ret = -1;
         goto egl_terminate;
@@ -750,6 +750,9 @@ main(int argc, char **argv)
     free(current_shader_names);
     free(shader_test);
     free(core.extension_string);
+
+    eglDestroyContext(egl_dpy, g_compat_ctx);
+    eglDestroyContext(egl_dpy, g_core_ctx);
 
  egl_terminate:
     eglTerminate(egl_dpy);
