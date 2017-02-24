@@ -747,6 +747,8 @@ main(int argc, char **argv)
                shaders_compiled, ctx_switches);
     }
 
+    #pragma omp taskwait
+
     free(current_shader_names);
     free(shader_test);
     free(core.extension_string);
